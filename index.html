@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <title>Frontend Mentor | Time tracking dashboard</title>
+
+  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+  <style>
+    .attribution { font-size: 15px; text-align: center; margin-top:1rem; }
+    .attribution a { color: var(--play); }
+  </style>
+</head>
+<body>
+
+
+  <div class="container" x-data="data">
+    <div class="user">
+      <div class="report-user">
+        <img src="./images/image-jeremy.png" alt="">
+        <div class="user-info">
+          <p>Report for</p>
+          <h1>Jeremy Robson</h1>
+        </div>
+      </div>
+      
+    
+      <div class=buttons>
+        <button class="btn" @click="changeReport('daily')" :class="active === 'daily' ? 'active' : ''">Daily</button>
+        <button class="btn" @click="changeReport('weekly')" :class="active === 'weekly' ? 'active' : ''">Weekly</button>
+        <button class="btn" @click="changeReport('monthly')" :class="active === 'monthly' ? 'active' : ''">Monthly</button>
+      </div>
+    </div>
+
+      <div class="activities">
+    <div class="work">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Work</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.work.current"></span>
+          <span class="period" x-text="activities.work.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="play">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Play</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.play.current"></span>
+          <span class="period" x-text="activities.play.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="study">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Study</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.study.current"></span>
+          <span class="period" x-text="activities.study.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="exercise">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Exercise</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.exercise.current"></span>
+          <span class="period" x-text="activities.exercise.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="social">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Social</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.social.current"></span>
+          <span class="period" x-text="activities.social.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+    <div class="self_care">
+      <div class="outer-frame">
+      
+      </div>
+      <div class="inner-frame">
+        <div>
+          <h2>Self Care</h2>
+          <button>
+              <img src="./images/icon-ellipsis.svg" alt="ellipsis">
+        </button>
+      </div>
+        <div class="time">
+          <span class="hrs" x-text="activities.self_care.current"></span>
+          <span class="period" x-text="activities.self_care.previous"></span>
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  
+<script>
+  
+
+document.addEventListener('alpine:init', () => {
+    Alpine.data('data', () => ({
+        init() {
+            this.changeReport('weekly')
+        },
+
+        active: 'weekly',
+        previousText: 'Last Week - ',
+        activities: {
+            work: {
+                current: '',
+                previous: '',
+            },
+            play: {
+                current: '',
+                previous: '',
+            },
+            study: {
+                current: '',
+                previous: '',
+            },
+            exercise: {
+                current: '',
+                previous: '',
+            },
+            social: {
+                current: '',
+                previous: '',
+            },
+            self_care: {
+                current: '',
+                previous: '',
+            },
+        },
+
+        changeReport(range) {
+          
+            this.active = range
+
+            if (range.includes('daily')) {
+                this.previousText = 'Yesterday - '
+            } else if (range.includes('weekly')) {
+                this.previousText = 'Last Week - '
+            } else if (range.includes('monthly')) {
+                this.previousText = 'Last Month - '
+            }
+
+            fetch('./data.json')
+                .then(response => response.json())
+                .then(data => {
+                    let x = 0
+                    for (let i in this.activities) {
+                        this.activities[i].current = `${data[x].timeframes[range].current}hrs`
+                        this.activities[i].previous = `${this.previousText} ${data[x].timeframes[range].previous}hrs`
+                        x++
+                    }
+                })
+                .catch(err => console.error("Error: ", err));
+        }
+
+    }))
+})
+</script>
+  
+
+
+  
+  <div class="attribution">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
+    Coded by <a href="https://github.com/GeorgiPavlov89">Georgi Pavlov</a>.
+  </div>
+</body>
+</html>
